@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Login{% endblock %}</h1>
+
+{% endblock %}
+
+{%block img%}
+<img src="{{ url_for('static', filename='ski_image.JPG') }}">
+{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+
+{{ result_message }}
+<form method="post">
+    <label for="userid">Username</label>
+    <input name="userid" id="userid" required>
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" required>
+    <input type="submit" value="LOGIN">
+</form>
+{% endblock %}

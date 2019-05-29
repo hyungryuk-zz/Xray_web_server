@@ -1,0 +1,33 @@
+<!doctype html>
+<title>{% block title %}{% endblock %} - SKI_XRAY</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<header>
+    <img class="header_without_nav">
+        {% block img %}
+        {% endblock %}
+        <h1 class="header_title">SKI 서산 이미지 분석 중앙 서버 </h1>
+        {% if g.user %}
+        <div class="header_item">
+            <span class="user_name">{{ g.user['username'] }}</span>
+            <a href="{{ url_for('auth_blueprint.logout_router') }}">로그아웃</a>
+                {% else %}
+
+                {% endif %}
+        </div>
+    </div>
+    <nav>
+    {% block nav %}{% endblock %}
+    </nav>
+    <div class="side_menu">
+        {% block menu %}{% endblock %}
+    </div>
+
+</header>
+<main>
+    <section>
+        <article>
+            {% block content %}{% endblock %}
+        </article>
+    </section>
+</main>

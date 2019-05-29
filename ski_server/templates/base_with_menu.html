@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{%block menu%}
+<ul class="menu">
+    <li>DashBoard
+        <ul>
+            <li><a href="{{ url_for('dashboard_blueprint.dashboard_graph_page_router') }}">대시보드</a></li>
+            <li><a href="{{ url_for('dashboard_blueprint.dashboard_statistic_page_router') }}">통계조회</a></li>
+            <li><a href="{{ url_for('dashboard_blueprint.dashboard_classification_result_page_router') }}">판정결과 조회</a></li>
+        </ul>
+    </li>
+    <li>파일 관리
+        <ul>
+            <li><a href="{{ url_for('filemanager_blueprint.file_explorer_page_router') }}">파일 탐색기</a></li>
+            <li>라벨 관리</li>
+        </ul>
+    </li>
+    <li>모델 관리
+        <ul>
+            <li>학습</li>
+            <li>학습 모니터링</li>
+            <li>모델 배포</li>
+        </ul>
+    </li>
+    <li>설정
+        <ul>
+            <li>사용자 관리</li>
+            <li>라인 관리</li>
+            <li>알고리즘 관리</li>
+            <li>필터 관리</li>
+            <li>로그 관리</li>
+            <li>환경 설정</li>
+        </ul>
+    </li>
+</ul>
+{% endblock %}
+

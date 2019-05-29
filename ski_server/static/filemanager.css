@@ -1,0 +1,9 @@
+#filebrowser{overflow:auto;height:800px;}
+
+.folder{background-image:url( "folder.JPG" );background-size: 100px 80px;float:left;padding-top:80px;padding-left:10px;margin-left:20px;margin-top:20px;background-repeat:no-repeat;text-align:center;width:90px;word-wrap:break-word;height:40px;}
+.folder:hover{background-color:rgba(0,0,0,0.1);cursor:pointer;}
+
+.file{background-image:url( "file.JPG" );background-size:100px 80px;float:left;padding-top:80px;padding-left:10px;margin-left:20px;margin-top:20px;background-repeat:no-repeat;text-align:center;width:90px;word-wrap:break-word;height:40px;}
+.file:hover{background-color:rgba(0,0,0,0.1);cursor:pointer;}
+
+.path{position:fixed;top:120px;left:300px;width:1200px;border-bottom:1px solid gray;padding-bottom:5px;padding-left:30px;font-weight:bold;}

@@ -1,0 +1,65 @@
+{% extends 'base_with_menu.html' %}
+
+
+{% block title %}
+DashBoard
+{% endblock %}
+{% block nav %}
+> 파일 관리 > <a href="{{ url_for('filemanager_blueprint.file_explorer_page_router') }}">파일 탐색기</a>
+{% endblock %}
+{% block header %}
+<h1>파일 관리</h1>
+{% endblock %}
+
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='filemanager.css') }}">
+
+    <div id="filebrowser">
+        <span class="path">경로 : {{path}}</span>
+    </div>
+
+
+<script>
+
+
+    function serversFileGroupToList(){
+        var fileList=[];
+
+        //<fileListFromServer> is from flask server (about this template, check 'jinja2' template)
+        {% for fileWithType in fileListFromServer %}
+            fileList.push("{{fileWithType}}".replace(/&#39;/gi,""));
+        {% endfor %}
+        return fileList;
+     }
+
+     function fileListToHTML(fileList){
+
+        for(fileIdx in fileList){
+
+            //fileList variable has [(filename,filetype) , ...] structure.
+            var fileAndType = fileList[fileIdx].replace("(","");
+            var fileName = fileAndType.split(",")[0];
+
+            //there are 3 types which are "0"(NOT_IMAGE_FILE),"1"(IMAGE_FILE),"2"(DIRACTORY)
+            var fileType= fileAndType.split(",")[1];
+
+            if(fileType.trim().includes("DIRACTORY")){
+                document.getElementById("filebrowser").innerHTML += "<div class='folder'>"+fileName+"</div>";
+            }else{
+                document.getElementById("filebrowser").innerHTML += "<div class='file'>"+fileName+"</div>";
+            }
+
+         }
+     }
+
+    fileListToHTML(serversFileGroupToList());
+
+
+
+
+
+</script>
+
+{% endblock %}
+

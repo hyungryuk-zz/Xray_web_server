@@ -1,36 +1,52 @@
 from flask import Blueprint, render_template, request,redirect, session,url_for, g
 import functools
 from . import db
+import enum
+
+
+class Login_result_message(enum.IntEnum):
+    PASSWORD_INVALID = 0
+    NO_USER_FOUND= 1
+    LOGIN_SUCCESS = 2
 
 auth_blueprint= Blueprint('auth_blueprint', __name__,
                       template_folder='templates',url_prefix='/auth')
 
+def get_user_from_db(user_id):
+    return db.DB().run_query_with_one_return("select * from iis_user where userid=%s",user_id)
+
+def update_user_connect_time_in_db(user_id):
+    import datetime
+    db.DB().run_query_with_no_return("UPDATE iis_user SET recent_connection = %s WHERE userid = %s",[datetime.datetime.now(),user_id])
+
+def user_login(input_user_id,input_password):
+    user = get_user_from_db(input_user_id)
+    if user is None :
+        return Login_result_message.NO_USER_FOUND
+    elif user["password"] != input_password:
+        return Login_result_message.PASSWORD_INVALID
+    else:
+        update_user_connect_time_in_db(user["userid"])
+        add_user_to_session(user)
+        return Login_result_message.LOGIN_SUCCESS
+
+def add_user_to_session(user):
+    session['user_id'] = user["userid"]
+    session['user_name'] = user["username"]
+
 @auth_blueprint.route("/login", methods=('GET', 'POST'))
 def login_router():
     if request.method == "POST":
-        user_id = request.form['userid']
-        user_password = request.form['password']
+        input_user_id = request.form['userid']
+        input_user_password = request.form['password']
+        login_result = user_login(input_user_id,input_user_password)
 
-        user = db.DB().run_query_with_one_return("select * from iis_user where userid=%s",user_id)
-
-        if user is None :
-            result_message = "no user with userid"
-            return render_template("auth/login.html",result_message = result_message)
-        else :
-            if user["password"]==user_password :
-                import datetime
-
-                db.DB().run_query_with_no_return("UPDATE iis_user SET recent_connection = %s",datetime.datetime.now())
-
-                session['user_id'] = user["userid"]
-                session['user_name'] = user["username"]
-
-                return redirect(url_for("dashboard_blueprint.dashboard_graph_page_router"))
-
-            else :
-                result_message = "incorrect PW"
-                return render_template("auth/login.html",result_message = result_message)
-
+        if login_result==Login_result_message.LOGIN_SUCCESS:
+            return redirect(url_for("dashboard_blueprint.dashboard_graph_page_router"))
+        elif login_result==Login_result_message.NO_USER_FOUND:
+            return render_template("auth/login.html",result_message = "no user with userid")
+        else:
+            return render_template("auth/login.html",result_message = "incorrect PW")
 
     elif request.method == "GET":
         if session.get("user_name") is None:

@@ -22,38 +22,38 @@ DashBoard
 
 <script>
 
+    const FileType={
+        DIRECTORY:0,
+        IMAGE_FILE:1,
+        NOT_IMAGE_FILE:2
+    }
 
-    function serversFileGroupToList(){
-        var fileList=[];
+    function onFolderDoubleClicked(filePath){
+        console.log(filePath);
+    }
 
-        //<fileListFromServer> is from flask server (about this template, check 'jinja2' template)
-        {% for fileWithType in fileListFromServer %}
-            fileList.push("{{fileWithType}}".replace(/&#39;/gi,""));
-        {% endfor %}
-        return fileList;
-     }
+    function fileListToHTML(){
 
-     function fileListToHTML(fileList){
-
+        var data = "{{filesWithJson}}".replace(/&#39;/gi, "\"").replace(/\\/gi, "/");
+        var fileList = JSON.parse(data);
+        fileList.sort(function(a, b) {
+            return a["filetype"]- b["filetype"];
+        });
         for(fileIdx in fileList){
-
-            //fileList variable has [(filename,filetype) , ...] structure.
-            var fileAndType = fileList[fileIdx].replace("(","");
-            var fileName = fileAndType.split(",")[0];
-
-            //there are 3 types which are "0"(NOT_IMAGE_FILE),"1"(IMAGE_FILE),"2"(DIRACTORY)
-            var fileType= fileAndType.split(",")[1];
-
-            if(fileType.trim().includes("DIRACTORY")){
-                document.getElementById("filebrowser").innerHTML += "<div class='folder'>"+fileName+"</div>";
+            var fileAndType = fileList[fileIdx];
+            console.log(fileAndType);
+            var fileName = fileList[fileIdx]["filename"];
+            var fileType= fileList[fileIdx]["filetype"];
+            var filePath= fileList[fileIdx]["filepath"];
+            if(fileType==FileType.DIRECTORY){
+                document.getElementById("filebrowser").innerHTML += "<div class='folder' ondblclick='onFolderDoubleClicked("+filePath+")'>"+fileName+"</div>";
             }else{
                 document.getElementById("filebrowser").innerHTML += "<div class='file'>"+fileName+"</div>";
             }
-
          }
      }
 
-    fileListToHTML(serversFileGroupToList());
+    fileListToHTML();
 
 
 

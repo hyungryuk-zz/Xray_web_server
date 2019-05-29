@@ -12,28 +12,6 @@ class Login_result_message(enum.IntEnum):
 auth_blueprint= Blueprint('auth_blueprint', __name__,
                       template_folder='templates',url_prefix='/auth')
 
-def get_user_from_db(user_id):
-    return db.DB().run_query_with_one_return("select * from iis_user where userid=%s",user_id)
-
-def update_user_connect_time_in_db(user_id):
-    import datetime
-    db.DB().run_query_with_no_return("UPDATE iis_user SET recent_connection = %s WHERE userid = %s",[datetime.datetime.now(),user_id])
-
-def user_login(input_user_id,input_password):
-    user = get_user_from_db(input_user_id)
-    if user is None :
-        return Login_result_message.NO_USER_FOUND
-    elif user["password"] != input_password:
-        return Login_result_message.PASSWORD_INVALID
-    else:
-        update_user_connect_time_in_db(user["userid"])
-        add_user_to_session(user)
-        return Login_result_message.LOGIN_SUCCESS
-
-def add_user_to_session(user):
-    session['user_id'] = user["userid"]
-    session['user_name'] = user["username"]
-
 @auth_blueprint.route("/login", methods=('GET', 'POST'))
 def login_router():
     if request.method == "POST":
@@ -54,12 +32,32 @@ def login_router():
         else :
             return redirect(url_for('dashboard_blueprint.dashboard_graph_page_router'))
 
+def user_login(input_user_id,input_password):
+    user = get_user_from_db(input_user_id)
+    if user is None :
+        return Login_result_message.NO_USER_FOUND
+    elif user["password"] != input_password:
+        return Login_result_message.PASSWORD_INVALID
+    else:
+        update_user_connect_time_in_db(user["userid"])
+        add_user_to_session(user)
+        return Login_result_message.LOGIN_SUCCESS
+
+def get_user_from_db(user_id):
+    return db.DB().run_query_with_one_return("select * from iis_user where userid=%s",user_id)
+
+def update_user_connect_time_in_db(user_id):
+    import datetime
+    db.DB().run_query_with_no_return("UPDATE iis_user SET recent_connection = %s WHERE userid = %s",[datetime.datetime.now(),user_id])
+
+def add_user_to_session(user):
+    session['user_id'] = user["userid"]
+    session['user_name'] = user["username"]
 
 @auth_blueprint.route('/logout')
 def logout_router():
     session.clear()
     return redirect(url_for('auth_blueprint.login_router'))
-
 
 @auth_blueprint.before_app_request
 def load_logged_in_user():

@@ -11,12 +11,7 @@ def login_router():
         user_id = request.form['userid']
         user_password = request.form['password']
 
-        db_conn = db.create_db_connection()
-        connected_db_cursor = db_conn.cursor()
-        connected_db_cursor.execute("select * from iis_user where userid=%s",user_id)
-        user = connected_db_cursor.fetchone()
-        connected_db_cursor.close()
-        db_conn.close()
+        user = db.DB().run_query_with_one_return("select * from iis_user where userid=%s",user_id)
 
         if user is None :
             result_message = "no user with userid"
@@ -25,11 +20,7 @@ def login_router():
             if user["password"]==user_password :
                 import datetime
 
-                db_conn = db.create_db_connection()
-                connected_db_cursor = db_conn.cursor()
-                connected_db_cursor.execute("UPDATE iis_user SET recent_connection = %s",datetime.datetime.now())
-                connected_db_cursor.close()
-                db_conn.close()
+                db.DB().run_query_with_no_return("UPDATE iis_user SET recent_connection = %s",datetime.datetime.now())
 
                 session['user_id'] = user["userid"]
                 session['user_name'] = user["username"]
@@ -60,12 +51,7 @@ def load_logged_in_user():
     if userid is None:
         g.user = None
     else:
-        db_conn = db.create_db_connection()
-        connected_db_cursor = db_conn.cursor()
-        connected_db_cursor.execute("select * from iis_user where userid=%s",userid)
-        g.user = connected_db_cursor.fetchone()
-        connected_db_cursor.close()
-        db_conn.close()
+        g.user = db.DB().run_query_with_one_return("select * from iis_user where userid=%s",userid)
 
 def login_required(view):
     @functools.wraps(view)

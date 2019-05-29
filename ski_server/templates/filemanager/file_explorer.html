@@ -27,37 +27,38 @@ DashBoard
         IMAGE_FILE:1,
         NOT_IMAGE_FILE:2
     }
+    main();
+
 
     function onFolderDoubleClicked(filePath){
         console.log(filePath);
     }
-
-    function fileListToHTML(){
-
-        var data = "{{filesWithJson}}".replace(/&#39;/gi, "\"").replace(/\\/gi, "/");
-        var fileList = JSON.parse(data);
-        fileList.sort(function(a, b) {
+    function getFileListWithJsonFormedString(){
+        return "{{filesWithJson}}".replace(/&#39;/gi, "\"").replace(/\\/gi, "/");
+    }
+    function makeDirectoryFirstOrder(serverFileList){
+        serverFileList.sort(function(a, b) {
             return a["filetype"]- b["filetype"];
         });
-        for(fileIdx in fileList){
-            var fileAndType = fileList[fileIdx];
-            console.log(fileAndType);
-            var fileName = fileList[fileIdx]["filename"];
-            var fileType= fileList[fileIdx]["filetype"];
-            var filePath= fileList[fileIdx]["filepath"];
+        return serverFileList
+    }
+    function fileListToHTML(serverFileList){
+        for(serverFileIdx in serverFileList){
+            var fileName = serverFileList[serverFileIdx]["filename"];
+            var fileType= serverFileList[serverFileIdx]["filetype"];
+            var filePath= serverFileList[serverFileIdx]["filepath"];
             if(fileType==FileType.DIRECTORY){
-                document.getElementById("filebrowser").innerHTML += "<div class='folder' ondblclick='onFolderDoubleClicked("+filePath+")'>"+fileName+"</div>";
+                document.getElementById("filebrowser").innerHTML += "<div class='folder' ondblclick='onFolderDoubleClicked(\""+filePath+"\")'>"+fileName+"</div>";
             }else{
                 document.getElementById("filebrowser").innerHTML += "<div class='file'>"+fileName+"</div>";
             }
          }
      }
-
-    fileListToHTML();
-
-
-
-
+    function main(){
+        var serverFileList = JSON.parse(getFileListWithJsonFormedString());
+        serverFileList = makeDirectoryFirstOrder(serverFileList);
+        fileListToHTML(serverFileList);
+    }
 
 </script>
 
